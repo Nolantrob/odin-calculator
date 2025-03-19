@@ -1,3 +1,4 @@
+// Initialize Variables and set display
 const display = document.querySelector('#display');
 const buttonContainer = document.querySelector('#button-container');
 
@@ -7,50 +8,27 @@ const backspaceButton = buttonContainer.querySelector('.backspace-button');
 const operatorButtons = buttonContainer.querySelectorAll('.operator-button');
 const equalsButton = buttonContainer.querySelector('.equals-button');
 
-equalsButton.addEventListener('click', () => {
-    createPartsForCalculating();
-})
-
 let leftArgument;
 let rightArgument;
 let currentOperator;
 let expression = '';
 updateDisplay();
 
-function createPartsForCalculating() {
-    let operators = '+-%/*'
-
-    currentOperator = expression
-        .split('')
-        .find(element => operators.includes(element));
-
-    let operatorIndex = expression.indexOf(currentOperator);
-
-    leftArgument = expression.slice(0,operatorIndex);
-    rightArgument = expression.slice(operatorIndex + 1);
-
-    operate(currentOperator,Number(leftArgument),Number(rightArgument));
-}
-
+// Event Listeners
 document.addEventListener('keypress', (event) => {
-    if (event.key <= 10){
+    if (event.key <= 10) {
         addCharacterToExpression(event.key);
     }
 })
 
-function addCharacterToExpression(char) {
-    if (expression.length >= 15){
-        return;
-    }
-
-    expression === '0' ? expression = char : expression += char;
-    updateDisplay();    
-}
+equalsButton.addEventListener('click', () => {
+    createPartsForCalculating();
+})
 
 operatorButtons.forEach(button => {
     button.addEventListener('click', () => {
 
-        if (!String(expression).includes(button.textContent)){
+        if (!String(expression).includes(button.textContent)) {
             expression += `${button.textContent}`;
             updateDisplay();
         }
@@ -71,49 +49,71 @@ numberButtons.forEach(button => {
 })
 
 
+// Math and Calculations
 
-add = function(num1,num2) {
-    expression = num1 + num2;
+function createPartsForCalculating() {
+    let operators = '+-%/*'
+
+    currentOperator = String(expression)
+        .split('')
+        .find(element => operators.includes(element));
+
+    let operatorIndex = expression.indexOf(currentOperator);
+
+    leftArgument = expression.slice(0, operatorIndex);
+    rightArgument = expression.slice(operatorIndex + 1);
+
+    operate(currentOperator, Number(leftArgument), Number(rightArgument));
 }
 
-subtract = function(num1,num2) {
-    expression = num1 - num2;
+add = function (num1, num2) {
+    return num1 + num2;
 }
 
-multiply = function(num1, num2) {
-    expression = num1 * num2;
+subtract = function (num1, num2) {
+    return num1 - num2;
 }
 
-divide = function(num1,num2) {
-    expression = num1 / num2;
+multiply = function (num1, num2) {
+    return num1 * num2;
 }
 
-operate = function(operator,num1,num2) {
+divide = function (num1, num2) {
+    return num1 / num2;
+}
 
-    switch(operator){
+operate = function (operator, num1, num2) {
+
+    let doOperation;
+
+    switch (operator) {
         case '+':
-            add(num1,num2);
-            updateDisplay();
+            doOperation = add;
             break;
         case '-':
-            subtract(num1,num2);
-            updateDisplay();
+            doOperation = subtract;
             break;
         case '*':
-            multiply(num1,num2)
-            updateDisplay();            
+            doOperation = multiply;
             break;
         case '/':
-            divide(num1,num2)
-            updateDisplay();
+            doOperation = divide;
             break;
         default:
             break;
     }
+
+    expression = doOperation(num1, num2);
+    updateDisplay();
 }
 
+function isInteger(value) {
+    return Number.isInteger(value);
+}
+
+// Handles Display
 function updateDisplay() {
-    if (expression.length <= 0){
+    if (expression.length <= 0) {
         expression = '0';
     }
 
@@ -121,11 +121,20 @@ function updateDisplay() {
 }
 
 function clearDisplay() {
-    expression = '0'
+    expression = '0';
     updateDisplay();
 }
 
 function backspace() {
-    expression = expression.slice(0,-1);
+    expression = expression.slice(0, -1);
+    updateDisplay();
+}
+
+function addCharacterToExpression(char) {
+    if (expression.length >= 15) {
+        return;
+    }
+
+    expression === '0' ? expression = char : expression += char;
     updateDisplay();
 }
