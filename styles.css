@@ -27,14 +27,13 @@ body {
 
 #display {
     background-color: rgb(119, 145, 129);
+    text-align: end;
     height: 15vh;
     width: 85%;
     border-radius: 10px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
     font-size: 41px;
     padding: 0px 24px 0px 14px;
+    overflow: hidden;
 }
 
 #button-container {

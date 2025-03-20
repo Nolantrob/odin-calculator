@@ -117,7 +117,7 @@ function updateDisplay() {
         expression = '0';
     }
 
-    display.textContent = expression;
+    display.value = expression;
 }
 
 function clearDisplay() {
@@ -126,14 +126,11 @@ function clearDisplay() {
 }
 
 function backspace() {
-    expression = expression.slice(0, -1);
+    expression = String(expression).slice(0, -1);
     updateDisplay();
 }
 
 function addCharacterToExpression(char) {
-    if (expression.length >= 15) {
-        return;
-    }
 
     expression === '0' ? expression = char : expression += char;
     updateDisplay();
