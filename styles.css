@@ -1,3 +1,8 @@
+@font-face {
+    font-family: 'Technology';
+    src: url(./fonts/technology.bold.ttf);
+}
+
 * {
     font-family: Roboto;
     padding: 0;
@@ -26,12 +31,13 @@ body {
 }
 
 #display {
+    font-family: 'Technology';
     background-color: rgb(119, 145, 129);
     text-align: end;
     height: 15vh;
     width: 85%;
     border-radius: 10px;
-    font-size: 41px;
+    font-size: 60px;
     padding: 0px 24px 0px 14px;
     overflow: hidden;
 }
