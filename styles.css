@@ -10,16 +10,20 @@
 }
 
 body {
-    background-color: black;
+    background-color: rgb(26, 26, 26);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 #main-calc-container {
-    background-color: rgb(43, 43, 43);
-    height: 100vh;
+    margin-top: 10vh;
+    background-color: rgb(66, 66, 66);
+    height: 650px;
     width: 420px;
+    border: 2px solid rgb(0, 0, 0);
+    border-radius: 15px;
+    overflow: hidden;
 }
 
 #display-container {
@@ -34,8 +38,9 @@ body {
     font-family: 'Technology';
     background-color: rgb(119, 145, 129);
     text-align: end;
-    height: 15vh;
-    width: 85%;
+    border: 2px solid black;
+    height: 10vh;
+    width: 65%;
     border-radius: 10px;
     font-size: 60px;
     padding: 0px 24px 0px 14px;
@@ -43,26 +48,27 @@ body {
 }
 
 #button-container {
-    margin-top: 20px;
-    display: flex;
+    margin-top: 10px;
+    display: grid;
     justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(4,0fr);
     gap: 10px;
 }
 
 #button-container button {
-    background-color: rgb(114, 64, 106);
+    background-color: rgb(77, 58, 34);
+    border: 2px solid rgb(0, 0, 0);
     color: white;
-    font-size: 40px;
+    font-size: 30px;
+    font-weight: bolder;
     padding: 5px;
-    display: flex;
+    display: grid;
     justify-content: center;
     align-items: center;
     width: 80px;
-    height: 80px;
-    border: none;
-    border-radius: 40px;
+    height: 60px;
+    border-radius: 20px;
 }
 
 #button-container button:hover {

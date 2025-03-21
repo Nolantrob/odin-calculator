@@ -8,170 +8,222 @@ const backspaceButton = buttonContainer.querySelector('.backspace-button');
 const operatorButtons = buttonContainer.querySelectorAll('.operator-button');
 const equalsButton = buttonContainer.querySelector('.equals-button');
 const decimalButton = buttonContainer.querySelector('.decimal-button');
+const toggleNegativeButton = buttonContainer.querySelector('.negative-button')
 
-let leftArgument;
-let rightArgument;
-let currentOperator;
+let leftArgument = 0;
+let rightArgument = '';
+let currentOperator = '';
 let expression = '';
 let operators = '+-%/*';
-let finalChar = expression.charAt(expression.length - 1);
+let numericals = '0123456789'
+let isCalculated = false;
+
+function updateDisplay() {
+
+    if (leftArgument.length === 0){
+        leftArgument = 0;
+    }
+
+    expression = `${leftArgument}${currentOperator}${rightArgument}`;
+
+    display.value = expression;
+    isCalculated = false;
+}
 updateDisplay();
 
-// Event Listeners
-document.addEventListener('keypress', (event) => {
-    if (event.key <= 10) {
-        addCharacterToExpression(event.key);
-    }
-})
-
-equalsButton.addEventListener('click', () => {
-    createPartsForCalculating(expression);
-    operate(currentOperator, Number(leftArgument), Number(rightArgument));
-})
-
-function containsOperator(string) {
-    return String(string)
-        .split('')
-        .some(char => operators.includes(char));
+function isOperator(char) {
+    return operators.includes(char);
 }
 
-decimalButton.addEventListener('click', () => {
-
-    let decimalOperator = String(expression)
-        .split('')
-        .find(element => operators.includes(element));
-
-    let decimalOperatorIndex = expression.indexOf(decimalOperator);
-    let decimalLeftArgument = containsOperator(expression) ? expression.slice(0, decimalOperatorIndex) : expression;
-    let decimalRightArgument = expression.slice(decimalOperatorIndex + 1);
-
-    if (!String(decimalLeftArgument).includes('.')){
-        let beginLeftArg = decimalLeftArgument === '' ? '0.' : '.';
-        addCharacterToExpression(beginLeftArg);            
-    } else if (!String(decimalRightArgument).includes('.')){
-        let beginRightArg = decimalRightArgument === '' ? '0.' : '.';
-        addCharacterToExpression(beginRightArg);            
-
-    }
-})
-
-operatorButtons.forEach(button => {
-    button.addEventListener('click', () => {
-
-        if (!containsOperator(expression)){
-            addCharacterToExpression(button.textContent);
-        } else {
-            expression = expression.slice(0,-1)
-            addCharacterToExpression(button.textContent);
-        }
-
-    })
-})
-
-clearDisplayButton.addEventListener('click', () => {
-    clearDisplay();
-})
-backspaceButton.addEventListener('click', () => {
-    backspace();
-})
-
-numberButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        addCharacterToExpression(button.textContent)
-    })
-})
-
-
-// Math and Calculations
-
-function createPartsForCalculating(expression) {
-
-    currentOperator = String(expression)
-        .split('')
-        .find(element => operators.includes(element));
-
-    let operatorIndex = expression.indexOf(currentOperator);
-
-    leftArgument = expression.slice(0, operatorIndex);
-    rightArgument = expression.slice(operatorIndex + 1);
-
+function isEmpty(segment) {
+    return segment.length <= 0;
 }
-
-add = function (num1, num2) {
-    return num1 + num2;
-}
-
-subtract = function (num1, num2) {
-    return num1 - num2;
-}
-
-multiply = function (num1, num2) {
-    return num1 * num2;
-}
-
-divide = function (num1, num2) {
-    return num2 === 0 ? '5138008' : num1 / num2;
-}
-
-operate = function (operator, num1, num2) {
     
-    if (containsOperator(finalChar)){
+function isNumerical(char) {
+    return numericals.includes(char);
+}
+
+
+function addCharToExpression(char) {
+    if (leftArgument === 'Nice try' && isOperator(char)){
         return;
     }
 
-    let doOperation;
+    if (isCalculated && !currentOperator && isNumerical(char)){
+        leftArgument = char;
+        updateDisplay();
+        return;
+    }
 
-    switch (operator) {
+    // If the character is numerical and there's no operator, put it on the left
+    if (isNumerical(char) && isEmpty(currentOperator)){
+        leftArgument === 0 || leftArgument === '0' ? leftArgument = char : leftArgument += char;
+    // If there IS an operator, put it on the right
+    } else if (isNumerical(char) && !isEmpty(currentOperator)){
+        rightArgument === 0 || rightArgument === '0' ? rightArgument = char : rightArgument += char;
+        // If it's neither, it's an operator
+    } else {
+        // Is there an operator? If no, set operator
+        if (isEmpty(rightArgument)){
+            currentOperator = char;
+            // Otherwise, calculate what we have, and start with our new operator
+        } else {
+            calculate();
+            currentOperator = char;
+        }
+    }
+
+    updateDisplay();
+}
+
+function backspace() {
+    if (isCalculated) {
+        clearDisplay();
+        return;
+    } else {
+        if (String(rightArgument).length > 0) {
+            rightArgument = rightArgument.slice(0, -1);
+        } else if (currentOperator.length > 0) {
+            currentOperator = currentOperator.slice(0, -1);
+        } else {
+            leftArgument = String(leftArgument).slice(0, -1);
+        }
+    }
+    updateDisplay();
+
+}
+
+function clearDisplay() {
+    leftArgument = '';
+    currentOperator = '';
+    rightArgument = '';
+    updateDisplay();
+}
+
+
+function calculate() {
+
+    if (leftArgument && currentOperator && !rightArgument || leftArgument && !currentOperator && !rightArgument){
+        let saveLeft = leftArgument;
+        clearDisplay();
+        leftArgument = saveLeft;
+        updateDisplay();
+        return;
+    }
+
+    let result;
+    let num1 = Number(leftArgument);
+    let num2 = Number(rightArgument);
+    let easterEggTrigger = false;
+
+    switch(currentOperator){
         case '+':
-            doOperation = add;
+            result = num1 + num2;
             break;
         case '-':
-            doOperation = subtract;
+            result = num1 - num2;
             break;
         case '*':
-            doOperation = multiply;
+            result = num1 * num2;
             break;
         case '/':
-            doOperation = divide;
+            result = num2 === 0 ? easterEggTrigger = true : num1 / num2;
+            break;
+        case '%':
+            result = num1 % num2;
             break;
         default:
             break;
     }
 
-    expression = doOperation(num1, num2);
-    updateDisplay();
-}
-
-
-// Handles Display
-function updateDisplay() {
-    if (expression.length <= 0) {
-        expression = '0';
+    if (easterEggTrigger === true){
+        clearDisplay();
+        leftArgument = 'Nice try';
+        isCalculated = true;
+        updateDisplay();
+        return;
     }
 
-    if (expression === '.'){
-        expression = '0.'
+    leftArgument = Number.isInteger(result) ? result : result.toFixed(3);
+    currentOperator = '';
+    rightArgument = '';
+    isCalculated = true;
+    updateDisplay();
+}
+
+function toggleNegative() {
+    String(rightArgument).length > 0 ? rightArgument *= -1 : leftArgument *= -1;
+    updateDisplay();
+}
+
+function createDecimal() {
+
+    if (isCalculated && !rightArgument){
+        leftArgument = '0.'
+        updateDisplay();
+        isCalculated = false;
     }
 
-    display.value = expression;
-}
-
-function clearDisplay() {
-    expression = '';
+    if(currentOperator && !String(rightArgument).includes('.')){
+        if (rightArgument.length > 0){
+            rightArgument += '.';
+        } else {
+            rightArgument += '0.';
+        }
+    } else if (!currentOperator && !String(leftArgument).includes('.')){
+        leftArgument += '.';
+    }
     updateDisplay();
 }
 
-function backspace() {
-    expression = String(expression).slice(0, -1);
-    updateDisplay();
-}
+// Event Listeners
+buttonContainer.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', () => {
+        switch (button.className){
+            case 'operator-button':
+                addCharToExpression(button.textContent);
+                break;
+            case 'number-button':
+                addCharToExpression(button.textContent);
+                break;
+            case 'clear-display-button':
+                clearDisplay();
+                break;
+            case 'negative-button':
+                toggleNegative();
+                break;
+            case 'decimal-button':
+                createDecimal();
+                break;
+            case 'equals-button':
+                calculate();
+                break;
+            case 'backspace-button':
+                backspace();
+                break;
+            default:
+                break;
+        }    
+    })
+})
 
-function addCharacterToExpression(char) {
-    if (containsOperator(char)){
-        expression += char;
-    } else {
-        expression === '0' ? expression = char : expression += char;
+document.addEventListener('keypress', (event) => {
+    console.log(event.key);
+    if (isNumerical(event.key) || isOperator(event.key)){
+        addCharToExpression(event.key)
     }
 
-    updateDisplay();
-}
+    switch (event.key){
+        case '=':
+            calculate();
+            break;
+        case 'Enter':
+            calculate();
+            break;
+        case '.':
+            createDecimal();
+            break;
+        default:
+            break;
+    }
+})
