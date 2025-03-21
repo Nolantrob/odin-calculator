@@ -14,6 +14,7 @@ let rightArgument;
 let currentOperator;
 let expression = '';
 let operators = '+-%/*';
+let finalChar = expression.charAt(expression.length - 1);
 updateDisplay();
 
 // Event Listeners
@@ -29,7 +30,7 @@ equalsButton.addEventListener('click', () => {
 })
 
 function containsOperator(string) {
-    return string
+    return String(string)
         .split('')
         .some(char => operators.includes(char));
 }
@@ -40,25 +41,30 @@ decimalButton.addEventListener('click', () => {
         .split('')
         .find(element => operators.includes(element));
 
-
     let decimalOperatorIndex = expression.indexOf(decimalOperator);
     let decimalLeftArgument = containsOperator(expression) ? expression.slice(0, decimalOperatorIndex) : expression;
     let decimalRightArgument = expression.slice(decimalOperatorIndex + 1);
 
     if (!String(decimalLeftArgument).includes('.')){
-        addCharacterToExpression('.');
+        let beginLeftArg = decimalLeftArgument === '' ? '0.' : '.';
+        addCharacterToExpression(beginLeftArg);            
     } else if (!String(decimalRightArgument).includes('.')){
-        addCharacterToExpression('.');
+        let beginRightArg = decimalRightArgument === '' ? '0.' : '.';
+        addCharacterToExpression(beginRightArg);            
+
     }
 })
 
 operatorButtons.forEach(button => {
     button.addEventListener('click', () => {
 
-        if (!String(expression).includes(button.textContent)) {
-            expression += `${button.textContent}`;
-            updateDisplay();
+        if (!containsOperator(expression)){
+            addCharacterToExpression(button.textContent);
+        } else {
+            expression = expression.slice(0,-1)
+            addCharacterToExpression(button.textContent);
         }
+
     })
 })
 
@@ -108,6 +114,10 @@ divide = function (num1, num2) {
 }
 
 operate = function (operator, num1, num2) {
+    
+    if (containsOperator(finalChar)){
+        return;
+    }
 
     let doOperation;
 
@@ -132,9 +142,6 @@ operate = function (operator, num1, num2) {
     updateDisplay();
 }
 
-function isInteger(value) {
-    return Number.isInteger(value);
-}
 
 // Handles Display
 function updateDisplay() {
@@ -142,11 +149,15 @@ function updateDisplay() {
         expression = '0';
     }
 
+    if (expression === '.'){
+        expression = '0.'
+    }
+
     display.value = expression;
 }
 
 function clearDisplay() {
-    expression = '0';
+    expression = '';
     updateDisplay();
 }
 
@@ -156,7 +167,11 @@ function backspace() {
 }
 
 function addCharacterToExpression(char) {
+    if (containsOperator(char)){
+        expression += char;
+    } else {
+        expression === '0' ? expression = char : expression += char;
+    }
 
-    expression === '0' ? expression = char : expression += char;
     updateDisplay();
 }
